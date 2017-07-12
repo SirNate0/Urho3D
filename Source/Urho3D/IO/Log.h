@@ -154,4 +154,17 @@ private:
 #define URHO3D_LOGRAWF(...) ((void)0)
 #endif
 
+//Convenience macros so that URHO3D_ is not needed
+#define LOGDEBUG(message)  URHO3D_LOGDEBUG(message) 
+#define LOGINFO(message)  URHO3D_LOGINFO(message) 
+#define LOGWARNING(message)  URHO3D_LOGWARNING(message) 
+#define LOGERROR(message)  URHO3D_LOGERROR(message) 
+#define LOGRAW(message)  URHO3D_LOGRAW(message) 
+#define LOGDEBUGF(...)  URHO3D_LOGDEBUGF(##__VA_ARGS__)
+#define LOGINFOF(...)  URHO3D_LOGINFOF(##__VA_ARGS__)
+#define LOGWARNINGF(...)  URHO3D_LOGWARNINGF(##__VA_ARGS__)
+#define LOGERRORF(...)  URHO3D_LOGERRORF(##__VA_ARGS__)
+#define LOGRAWF(...)  URHO3D_LOGRAWF(##__VA_ARGS__)
+
+
 }
