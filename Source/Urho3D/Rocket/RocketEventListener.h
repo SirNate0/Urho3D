@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <Core/Object.h>
+#include "../Core/Object.h"
 #include <Rocket/Core/EventListenerInstancer.h>
 #include <Rocket/Core/EventListener.h>
-#include <AngelScript/ScriptFile.h>
+#include "../AngelScript/ScriptFile.h"
 
 //using namespace Rocket::Core;
 

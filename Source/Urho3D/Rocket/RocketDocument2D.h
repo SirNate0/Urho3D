@@ -13,7 +13,7 @@
 #include <Rocket/Core/Context.h>
 #include <Rocket/Core/ElementDocument.h>
 
-#include <Scene/Component.h>
+#include "../Scene/Component.h"
 
 
 namespace Urho3D

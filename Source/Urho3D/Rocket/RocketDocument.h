@@ -5,9 +5,9 @@
 
 #include <Rocket/Core/ElementDocument.h>
 #include <Rocket/Core/ElementInstancer.h>
-#include <Scene/Component.h>
-#include <AngelScript/ScriptFile.h>
-#include <IO/VectorBuffer.h>
+#include "../Scene/Component.h"
+#include "../AngelScript/ScriptFile.h"
+#include "../IO/VectorBuffer.h"
 
 namespace Urho3D
 {
