@@ -1,8 +1,8 @@
 #include "SystemInterface.h"
 
-#include <Core/Context.h>
-#include <Core/Timer.h>
-#include <IO/Log.h>
+#include "../Core/Context.h"
+#include "../Core/Timer.h"
+#include "../IO/Log.h"
 #include <Rocket/Core/Log.h>
 #include <Rocket/Controls/ElementFormControlInput.h>
 

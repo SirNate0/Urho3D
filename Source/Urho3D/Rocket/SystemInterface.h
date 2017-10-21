@@ -3,7 +3,7 @@
 
 #include <Rocket/Core/SystemInterface.h>
 #include <Rocket/Core/Log.h>
-#include <Core/Context.h>
+#include "../Core/Context.h"
 
 /**
 	A custom system interface for Rocket. This provides timing information.
