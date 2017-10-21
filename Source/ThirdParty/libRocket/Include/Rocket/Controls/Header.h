@@ -35,6 +35,11 @@
 	#pragma message("DEPRECATED: STATIC_LIB macro has been deprecated in favor of ROCKET_STATIC_LIB and support will be removed in a future release")
 #endif
 
+// Urho3D: Only export when it is being requested
+#if defined ROCKET_EXPORTS || defined URHO3D_STATIC_DEFINE
+	#define ROCKET_STATIC_LIB
+#endif
+
 #if !defined ROCKET_STATIC_LIB
 	#ifdef ROCKET_PLATFORM_WIN32
 		#ifdef RocketControls_EXPORTS
