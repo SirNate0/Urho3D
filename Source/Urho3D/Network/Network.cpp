@@ -38,12 +38,170 @@
 #include "../Network/Protocol.h"
 #include "../Scene/Scene.h"
 
-#include <kNet/kNet.h>
+#include <RakNet/MessageIdentifiers.h>
+#include <RakNet/RakPeerInterface.h>
+#include <RakNet/RakNetTypes.h>
 
 #include "../DebugNew.h"
 
 namespace Urho3D
 {
+
+static const char* RAKNET_MESSAGEID_STRINGS[] = {
+    "ID_CONNECTED_PING",
+    "ID_UNCONNECTED_PING",
+    "ID_UNCONNECTED_PING_OPEN_CONNECTIONS",
+    "ID_CONNECTED_PONG",
+    "ID_DETECT_LOST_CONNECTIONS",
+    "ID_OPEN_CONNECTION_REQUEST_1",
+    "ID_OPEN_CONNECTION_REPLY_1",
+    "ID_OPEN_CONNECTION_REQUEST_2",
+    "ID_OPEN_CONNECTION_REPLY_2",
+    "ID_CONNECTION_REQUEST",
+    "ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY",
+    "ID_OUR_SYSTEM_REQUIRES_SECURITY",
+    "ID_PUBLIC_KEY_MISMATCH",
+    "ID_OUT_OF_BAND_INTERNAL",
+    "ID_SND_RECEIPT_ACKED",
+    "ID_SND_RECEIPT_LOSS",
+    "ID_CONNECTION_REQUEST_ACCEPTED",
+    "ID_CONNECTION_ATTEMPT_FAILED",
+    "ID_ALREADY_CONNECTED",
+    "ID_NEW_INCOMING_CONNECTION",
+    "ID_NO_FREE_INCOMING_CONNECTIONS",
+    "ID_DISCONNECTION_NOTIFICATION",
+    "ID_CONNECTION_LOST",
+    "ID_CONNECTION_BANNED",
+    "ID_INVALID_PASSWORD",
+    "ID_INCOMPATIBLE_PROTOCOL_VERSION",
+    "ID_IP_RECENTLY_CONNECTED",
+    "ID_TIMESTAMP",
+    "ID_UNCONNECTED_PONG",
+    "ID_ADVERTISE_SYSTEM",
+    "ID_DOWNLOAD_PROGRESS",
+    "ID_REMOTE_DISCONNECTION_NOTIFICATION",
+    "ID_REMOTE_CONNECTION_LOST",
+    "ID_REMOTE_NEW_INCOMING_CONNECTION",
+    "ID_FILE_LIST_TRANSFER_HEADER",
+    "ID_FILE_LIST_TRANSFER_FILE",
+    "ID_FILE_LIST_REFERENCE_PUSH_ACK",
+    "ID_DDT_DOWNLOAD_REQUEST",
+    "ID_TRANSPORT_STRING",
+    "ID_REPLICA_MANAGER_CONSTRUCTION",
+    "ID_REPLICA_MANAGER_SCOPE_CHANGE",
+    "ID_REPLICA_MANAGER_SERIALIZE",
+    "ID_REPLICA_MANAGER_DOWNLOAD_STARTED",
+    "ID_REPLICA_MANAGER_DOWNLOAD_COMPLETE",
+    "ID_RAKVOICE_OPEN_CHANNEL_REQUEST",
+    "ID_RAKVOICE_OPEN_CHANNEL_REPLY",
+    "ID_RAKVOICE_CLOSE_CHANNEL",
+    "ID_RAKVOICE_DATA",
+    "ID_AUTOPATCHER_GET_CHANGELIST_SINCE_DATE",
+    "ID_AUTOPATCHER_CREATION_LIST",
+    "ID_AUTOPATCHER_DELETION_LIST",
+    "ID_AUTOPATCHER_GET_PATCH",
+    "ID_AUTOPATCHER_PATCH_LIST",
+    "ID_AUTOPATCHER_REPOSITORY_FATAL_ERROR",
+    "ID_AUTOPATCHER_CANNOT_DOWNLOAD_ORIGINAL_UNMODIFIED_FILES",
+    "ID_AUTOPATCHER_FINISHED_INTERNAL",
+    "ID_AUTOPATCHER_FINISHED",
+    "ID_AUTOPATCHER_RESTART_APPLICATION",
+    "ID_NAT_PUNCHTHROUGH_REQUEST",
+    "ID_NAT_CONNECT_AT_TIME",
+    "ID_NAT_GET_MOST_RECENT_PORT",
+    "ID_NAT_CLIENT_READY",
+    "ID_NAT_TARGET_NOT_CONNECTED",
+    "ID_NAT_TARGET_UNRESPONSIVE",
+    "ID_NAT_CONNECTION_TO_TARGET_LOST",
+    "ID_NAT_ALREADY_IN_PROGRESS",
+    "ID_NAT_PUNCHTHROUGH_FAILED",
+    "ID_NAT_PUNCHTHROUGH_SUCCEEDED",
+    "ID_READY_EVENT_SET",
+    "ID_READY_EVENT_UNSET",
+    "ID_READY_EVENT_ALL_SET",
+    "ID_READY_EVENT_QUERY",
+    "ID_LOBBY_GENERAL",
+    "ID_RPC_REMOTE_ERROR",
+    "ID_RPC_PLUGIN",
+    "ID_FILE_LIST_REFERENCE_PUSH",
+    "ID_READY_EVENT_FORCE_ALL_SET",
+    "ID_ROOMS_EXECUTE_FUNC",
+    "ID_ROOMS_LOGON_STATUS",
+    "ID_ROOMS_HANDLE_CHANGE",
+    "ID_LOBBY2_SEND_MESSAGE",
+    "ID_LOBBY2_SERVER_ERROR",
+    "ID_FCM2_NEW_HOST",
+    "ID_FCM2_REQUEST_FCMGUID",
+    "ID_FCM2_RESPOND_CONNECTION_COUNT",
+    "ID_FCM2_INFORM_FCMGUID",
+    "ID_FCM2_UPDATE_MIN_TOTAL_CONNECTION_COUNT",
+    "ID_FCM2_VERIFIED_JOIN_START",
+    "ID_FCM2_VERIFIED_JOIN_CAPABLE",
+    "ID_FCM2_VERIFIED_JOIN_FAILED",
+    "ID_FCM2_VERIFIED_JOIN_ACCEPTED",
+    "ID_FCM2_VERIFIED_JOIN_REJECTED",
+    "ID_UDP_PROXY_GENERAL",
+    "ID_SQLite3_EXEC",
+    "ID_SQLite3_UNKNOWN_DB",
+    "ID_SQLLITE_LOGGER",
+    "ID_NAT_TYPE_DETECTION_REQUEST",
+    "ID_NAT_TYPE_DETECTION_RESULT",
+    "ID_ROUTER_2_INTERNAL",
+    "ID_ROUTER_2_FORWARDING_NO_PATH",
+    "ID_ROUTER_2_FORWARDING_ESTABLISHED",
+    "ID_ROUTER_2_REROUTED",
+    "ID_TEAM_BALANCER_INTERNAL",
+    "ID_TEAM_BALANCER_REQUESTED_TEAM_FULL",
+    "ID_TEAM_BALANCER_REQUESTED_TEAM_LOCKED",
+    "ID_TEAM_BALANCER_TEAM_REQUESTED_CANCELLED",
+    "ID_TEAM_BALANCER_TEAM_ASSIGNED",
+    "ID_LIGHTSPEED_INTEGRATION",
+    "ID_XBOX_LOBBY",
+    "ID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_SUCCESS",
+    "ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_SUCCESS",
+    "ID_TWO_WAY_AUTHENTICATION_INCOMING_CHALLENGE_FAILURE",
+    "ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_FAILURE",
+    "ID_TWO_WAY_AUTHENTICATION_OUTGOING_CHALLENGE_TIMEOUT",
+    "ID_TWO_WAY_AUTHENTICATION_NEGOTIATION",
+    "ID_CLOUD_POST_REQUEST",
+    "ID_CLOUD_RELEASE_REQUEST",
+    "ID_CLOUD_GET_REQUEST",
+    "ID_CLOUD_GET_RESPONSE",
+    "ID_CLOUD_UNSUBSCRIBE_REQUEST",
+    "ID_CLOUD_SERVER_TO_SERVER_COMMAND",
+    "ID_CLOUD_SUBSCRIPTION_NOTIFICATION",
+    "ID_LIB_VOICE",
+    "ID_RELAY_PLUGIN",
+    "ID_NAT_REQUEST_BOUND_ADDRESSES",
+    "ID_NAT_RESPOND_BOUND_ADDRESSES",
+    "ID_FCM2_UPDATE_USER_CONTEXT",
+    "ID_RESERVED_3",
+    "ID_RESERVED_4",
+    "ID_RESERVED_5",
+    "ID_RESERVED_6",
+    "ID_RESERVED_7",
+    "ID_RESERVED_8",
+    "ID_RESERVED_9",
+    //"ID_USER_PACKET_ENUM"
+    "MSG_IDENTITY",
+    "MSG_CONTROLS",
+    "MSG_SCENELOADED",
+    "MSG_REQUESTPACKAGE",
+    "MSG_PACKAGEDATA",
+    "MSG_LOADSCENE",
+    "MSG_SCENECHECKSUMERROR",
+    "MSG_CREATENODE",
+    "MSG_NODEDELTAUPDATE",
+    "MSG_NODELATESTDATA",
+    "MSG_REMOVENODE",
+    "MSG_CREATECOMPONENT",
+    "MSG_COMPONENTDELTAUPDATE",
+    "MSG_COMPONENTLATESTDATA",
+    "MSG_REMOVECOMPONENT",
+    "MSG_REMOTEEVENT",
+    "MSG_REMOTENODEEVENT",
+    "MSG_PACKAGEINFO"
+};
 
 static const int DEFAULT_UPDATE_FPS = 30;
 
@@ -55,7 +213,7 @@ Network::Network(Context* context) :
     updateInterval_(1.0f / (float)DEFAULT_UPDATE_FPS),
     updateAcc_(0.0f)
 {
-    network_ = new kNet::Network();
+    rakPeer_ = RakNet::RakPeerInterface::GetInstance();
 
     // Register Network library object factories
     RegisterNetworkLibrary(context_);
@@ -114,10 +272,12 @@ Network::~Network()
     serverConnection_.Reset();
 
     clientConnections_.Clear();
+
+    RakNet::RakPeerInterface::DestroyInstance(rakPeer_);
+    rakPeer_ = 0;
 }
 
-void Network::HandleMessage(kNet::MessageConnection* source, kNet::packet_id_t packetId, kNet::message_id_t msgId, const char* data,
-    size_t numBytes)
+void Network::HandleMessage(const RakNet::AddressOrGUID& source, int packetId, int msgId, const char* data, size_t numBytes)
 {
     // Only process messages from known sources
     Connection* connection = GetConnection(source);
@@ -137,37 +297,13 @@ void Network::HandleMessage(kNet::MessageConnection* source, kNet::packet_id_t p
         connection->SendEvent(E_NETWORKMESSAGE, eventData);
     }
     else
-        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + ToString((void*)source));
+        URHO3D_LOGWARNING("Discarding message from unknown MessageConnection " + String(source.ToString()));
 }
 
-u32 Network::ComputeContentID(kNet::message_id_t msgId, const char* data, size_t numBytes)
+void Network::NewConnectionEstablished(const RakNet::AddressOrGUID& connection)
 {
-    switch (msgId)
-    {
-    case MSG_CONTROLS:
-        // Return fixed content ID for controls
-        return CONTROLS_CONTENT_ID;
-
-    case MSG_NODELATESTDATA:
-    case MSG_COMPONENTLATESTDATA:
-        {
-            // Return the node or component ID, which is first in the message
-            MemoryBuffer msg(data, (unsigned)numBytes);
-            return msg.ReadNetID();
-        }
-
-    default:
-        // By default return no content ID
-        return 0;
-    }
-}
-
-void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
-{
-    connection->RegisterInboundMessageHandler(this);
-
     // Create a new client connection corresponding to this MessageConnection
-    SharedPtr<Connection> newConnection(new Connection(context_, true, kNet::SharedPtr<kNet::MessageConnection>(connection)));
+    SharedPtr<Connection> newConnection(new Connection(context_, true, connection, rakPeer_));
     newConnection->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
     clientConnections_[connection] = newConnection;
     URHO3D_LOGINFO("Client " + newConnection->ToString() + " connected");
@@ -179,12 +315,10 @@ void Network::NewConnectionEstablished(kNet::MessageConnection* connection)
     newConnection->SendEvent(E_CLIENTCONNECTED, eventData);
 }
 
-void Network::ClientDisconnected(kNet::MessageConnection* connection)
+void Network::ClientDisconnected(const RakNet::AddressOrGUID& connection)
 {
-    connection->Disconnect(0);
-
     // Remove the client connection that corresponds to this MessageConnection
-    HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
+    HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Find(connection);
     if (i != clientConnections_.End())
     {
         Connection* connection = i->second_;
@@ -200,21 +334,49 @@ void Network::ClientDisconnected(kNet::MessageConnection* connection)
     }
 }
 
+void Network::SetDiscoveryBeacon(const VariantMap& data)
+{
+    VectorBuffer buffer;
+    buffer.WriteVariantMap(data);
+    if (buffer.GetSize() > 400)
+        URHO3D_LOGERROR("Discovery beacon of size: " + String(buffer.GetSize()) + " bytes is too large, modify MAX_OFFLINE_DATA_LENGTH in RakNet or reduce size");
+    rakPeer_->SetOfflinePingResponse((const char*)buffer.GetData(), buffer.GetSize());
+}
+
+void Network::DiscoverHosts(unsigned port)
+{
+    // JSandusky: Contrary to the manual, we actually do have to perform Startup first before we can Ping
+    if (rakPeer_ && !rakPeer_->IsActive())
+    {
+        RakNet::SocketDescriptor socket;
+        rakPeer_->Startup(1, &socket, 1);
+    }
+    rakPeer_->Ping("255.255.255.255", port, false);
+}
+
 bool Network::Connect(const String& address, unsigned short port, Scene* scene, const VariantMap& identity)
 {
     URHO3D_PROFILE(Connect);
 
-    // If a previous connection already exists, disconnect it and wait for some time for the connection to terminate
-    if (serverConnection_)
+    if (rakPeer_->IsActive())
     {
-        serverConnection_->Disconnect(100);
-        OnServerDisconnected();
+        /// Allow 300 ms to notify
+        rakPeer_->Shutdown(300);
     }
 
-    kNet::SharedPtr<kNet::MessageConnection> connection = network_->Connect(address.CString(), port, kNet::SocketOverUDP, this);
-    if (connection)
+    isServer_ = false;
+    RakNet::SocketDescriptor socket;
+    rakPeer_->Startup(1, &socket, 1);
+    RakNet::ConnectionAttemptResult connectResult = rakPeer_->Connect(address.CString(), port, 0, 0);
+    if (connectResult != RakNet::CONNECTION_ATTEMPT_STARTED)
     {
-        serverConnection_ = new Connection(context_, false, connection);
+        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port) + ", error code: " + String((int)connectResult));
+        SendEvent(E_CONNECTFAILED);
+        return false;
+    }
+    else
+    {
+        serverConnection_ = new Connection(context_, false, rakPeer_->GetMyBoundAddress(), rakPeer_);
         serverConnection_->SetScene(scene);
         serverConnection_->SetIdentity(identity);
         serverConnection_->SetConnectPending(true);
@@ -222,12 +384,6 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
 
         URHO3D_LOGINFO("Connecting to server " + serverConnection_->ToString());
         return true;
-    }
-    else
-    {
-        URHO3D_LOGERROR("Failed to connect to server " + address + ":" + String(port));
-        SendEvent(E_CONNECTFAILED);
-        return false;
     }
 }
 
@@ -247,14 +403,18 @@ bool Network::StartServer(unsigned short port)
 
     URHO3D_PROFILE(StartServer);
 
-    if (network_->StartServer(port, kNet::SocketOverUDP, this, true) != nullptr)
+    RakNet::SocketDescriptor socket(port, 0);
+    RakNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
+    if (startResult == RakNet::RAKNET_STARTED)
     {
         URHO3D_LOGINFO("Started server on port " + String(port));
+        rakPeer_->SetMaximumIncomingConnections(128);
+        isServer_ = true;
         return true;
     }
     else
     {
-        URHO3D_LOGERROR("Failed to start server on port " + String(port));
+        URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String((int)startResult));
         return false;
     }
 }
@@ -267,7 +427,9 @@ void Network::StopServer()
     URHO3D_PROFILE(StopServer);
 
     clientConnections_.Clear();
-    network_->StopServer();
+    // Provide 300 ms to notify
+    rakPeer_->Shutdown(300);
+
     URHO3D_LOGINFO("Stopped server");
 }
 
@@ -280,29 +442,31 @@ void Network::BroadcastMessage(int msgID, bool reliable, bool inOrder, const uns
     unsigned contentID)
 {
     // Make sure not to use kNet internal message ID's
-    if (msgID <= 0x4 || msgID >= 0x3ffffffe)
+    if (msgID < ID_USER_PACKET_ENUM || msgID >= 255)
     {
         URHO3D_LOGERROR("Can not send message with reserved ID");
         return;
     }
 
-    kNet::NetworkServer* server = network_->GetServer();
-    if (server)
-        server->BroadcastMessage((unsigned long)msgID, reliable, inOrder, 0, contentID, (const char*)data, numBytes);
+    VectorBuffer msgData;
+    msgData.WriteUByte((unsigned char)msgID);
+    msgData.Write(data, numBytes);
+
+    if (isServer_)
+        rakPeer_->Send((const char*)msgData.GetData(), (int)msgData.GetSize(), HIGH_PRIORITY, RELIABLE, (char)0, RakNet::UNASSIGNED_RAKNET_GUID, true);
     else
         URHO3D_LOGERROR("Server not running, can not broadcast messages");
 }
 
 void Network::BroadcastRemoteEvent(StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
-         i != clientConnections_.End(); ++i)
+    for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin(); i != clientConnections_.End(); ++i)
         i->second_->SendRemoteEvent(eventType, inOrder, eventData);
 }
 
 void Network::BroadcastRemoteEvent(Scene* scene, StringHash eventType, bool inOrder, const VariantMap& eventData)
 {
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -324,7 +488,7 @@ void Network::BroadcastRemoteEvent(Node* node, StringHash eventType, bool inOrde
     }
 
     Scene* scene = node->GetScene();
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -390,7 +554,7 @@ void Network::SendPackageToClients(Scene* scene, PackageFile* package)
         return;
     }
 
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
     {
         if (i->second_->GetScene() == scene)
@@ -408,17 +572,17 @@ SharedPtr<HttpRequest> Network::MakeHttpRequest(const String& url, const String&
     return request;
 }
 
-Connection* Network::GetConnection(kNet::MessageConnection* connection) const
+Connection* Network::GetConnection(const RakNet::AddressOrGUID& connection) const
 {
-    if (serverConnection_ && serverConnection_->GetMessageConnection() == connection)
+    if (serverConnection_ && serverConnection_->GetAddressOrGUID() == connection)
         return serverConnection_;
     else
     {
-        HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
+        HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Find(connection);
         if (i != clientConnections_.End())
             return i->second_;
         else
-            return nullptr;
+            return 0;
     }
 }
 
@@ -430,7 +594,7 @@ Connection* Network::GetServerConnection() const
 Vector<SharedPtr<Connection> > Network::GetClientConnections() const
 {
     Vector<SharedPtr<Connection> > ret;
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
+    for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::ConstIterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         ret.Push(i->second_);
 
@@ -439,7 +603,7 @@ Vector<SharedPtr<Connection> > Network::GetClientConnections() const
 
 bool Network::IsServerRunning() const
 {
-    return network_->GetServer();
+    return rakPeer_->IsActive() && isServer_;
 }
 
 bool Network::CheckRemoteEvent(StringHash eventType) const
@@ -451,31 +615,114 @@ void Network::Update(float timeStep)
 {
     URHO3D_PROFILE(UpdateNetwork);
 
-    // Process server connection if it exists
-    if (serverConnection_)
-    {
-        kNet::MessageConnection* connection = serverConnection_->GetMessageConnection();
-
-        // Receive new messages
-        connection->Process();
-
-        // Process latest data messages waiting for the correct nodes or components to be created
-        serverConnection_->ProcessPendingLatestData();
-
-        // Check for state transitions
-        kNet::ConnectionState state = connection->GetConnectionState();
-        if (serverConnection_->IsConnectPending() && state == kNet::ConnectionOK)
-            OnServerConnected();
-        else if (state == kNet::ConnectionPeerClosed)
-            serverConnection_->Disconnect();
-        else if (state == kNet::ConnectionClosed)
-            OnServerDisconnected();
-    }
-
     // Process the network server if started
-    kNet::SharedPtr<kNet::NetworkServer> server = network_->GetServer();
-    if (server)
-        server->Process();
+    if (rakPeer_->IsActive())
+    {
+        while (RakNet::Packet* packet = rakPeer_->Receive())
+        {
+            unsigned char packetID = packet->data[0];
+            bool packetHandled = false;
+
+            // Deal with timestamped backents
+            unsigned dataStart = sizeof(char);
+            if (packetID == ID_TIMESTAMP)
+            {
+                dataStart += sizeof(RakNet::Time);
+                packetID = packet->data[dataStart];
+                dataStart += sizeof(char);
+            }
+
+        // Connectivity messages
+            if (packetID == ID_NEW_INCOMING_CONNECTION) // We're a server/peer, we've got a new connection
+            {
+                NewConnectionEstablished(packet->systemAddress);
+                packetHandled = true;
+            }
+            else if (packetID == ID_CONNECTION_REQUEST_ACCEPTED) // We're a client, our connection as been accepted
+            {
+                OnServerConnected(packet->systemAddress);
+                packetHandled = true;
+            }
+            else if (packetID == ID_CONNECTION_LOST) // We've lost connectivity with the packet source
+            {
+                if (isServer_)
+                    ClientDisconnected(packet->systemAddress);
+                else
+                    OnServerDisconnected();
+                packetHandled = true;
+            }
+            else if (packetID == ID_DISCONNECTION_NOTIFICATION) // We've lost connection with the other side
+            {
+                if (isServer_) // If a server then we've lost the client
+                    ClientDisconnected(packet->systemAddress);
+                else // If a client then we've lost the server
+                    OnServerDisconnected();
+                packetHandled = true;
+            }
+            else if (packetID == ID_CONNECTION_ATTEMPT_FAILED) // We've failed to connect to the server/peer
+            {
+                SendEvent(E_CONNECTFAILED);
+                packetHandled = true;
+            }
+
+        // Denial of connection
+            else if (packetID == ID_CONNECTION_BANNED) // We're a client and we're on the ban list
+            {
+                if (!isServer_)
+                    SendEvent(E_NETWORKBANNED);
+                packetHandled = true;
+            }
+            else if (packetID == ID_INVALID_PASSWORD) // We're a client, and we gave an invalid password
+            {
+                if (!isServer_)
+                    SendEvent(E_NETWORKINVALIDPASSWORD);
+                packetHandled = true;
+            }
+        // RakNet special messages
+            else if (packetID == ID_DOWNLOAD_PROGRESS) // Part of a file transfer
+            {
+                
+            }
+            else if (packetID == ID_UNCONNECTED_PONG) // Host discovery response
+            {
+                // Timestamp included, need to eat it from the data size
+                dataStart += sizeof(RakNet::TimeMS);
+
+                VectorBuffer buffer(packet->data + dataStart, packet->length - dataStart);
+                VariantMap srcData = buffer.ReadVariantMap();
+
+                VariantMap& eventMap = context_->GetEventDataMap();
+                using namespace NetworkHostDiscovered;
+                eventMap[P_BEACON] = srcData;
+                eventMap[P_ADDRESS] = String(packet->systemAddress.ToString(false));
+                eventMap[P_PORT] = (int)packet->systemAddress.GetPort();
+                SendEvent(E_NETWORKHOSTDISCOVERED, eventMap);
+                packetHandled = true;
+            }
+
+        // Urho3D messages
+            if (packetID >= ID_USER_PACKET_ENUM)
+            {
+                if (!isServer_)
+                {
+                    MemoryBuffer buffer(packet->data + dataStart, packet->length - dataStart);
+                    serverConnection_->ProcessMessage(packetID, buffer);
+                }
+                else
+                    HandleMessage(packet->systemAddress, 0, packetID, (const char*)(packet->data + dataStart), packet->length - dataStart);
+                packetHandled = true;
+            }
+
+        // Log an error if we encounter a packet that we do not know how to handle
+            if (!packetHandled && packetID < sizeof(RAKNET_MESSAGEID_STRINGS))
+                URHO3D_LOGERROR("Unhandled network packet: " + String(RAKNET_MESSAGEID_STRINGS[packetID]));
+            else if (!packetHandled)
+                URHO3D_LOGERRORF("Unhandled network packet: %i", packetID);
+
+
+            rakPeer_->DeallocatePacket(packet);
+        }
+    }
 }
 
 void Network::PostUpdate(float timeStep)
@@ -499,7 +746,7 @@ void Network::PostUpdate(float timeStep)
                 URHO3D_PROFILE(PrepareServerUpdate);
 
                 networkScenes_.Clear();
-                for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+                for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
                 {
                     Scene* scene = i->second_->GetScene();
@@ -515,7 +762,7 @@ void Network::PostUpdate(float timeStep)
                 URHO3D_PROFILE(SendServerUpdate);
 
                 // Then send server updates for each client connection
-                for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+                for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
                      i != clientConnections_.End(); ++i)
                 {
                     i->second_->SendServerUpdate();
@@ -551,10 +798,10 @@ void Network::HandleRenderUpdate(StringHash eventType, VariantMap& eventData)
     PostUpdate(eventData[P_TIMESTEP].GetFloat());
 }
 
-void Network::OnServerConnected()
+void Network::OnServerConnected(const RakNet::AddressOrGUID& address)
 {
     serverConnection_->SetConnectPending(false);
-
+    serverConnection_->SetAddressOrGUID(address);
     URHO3D_LOGINFO("Connected to server");
 
     // Send the identity map now
@@ -588,7 +835,7 @@ void Network::ConfigureNetworkSimulator()
     if (serverConnection_)
         serverConnection_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 
-    for (HashMap<kNet::MessageConnection*, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
+    for (HashMap<RakNet::AddressOrGUID, SharedPtr<Connection> >::Iterator i = clientConnections_.Begin();
          i != clientConnections_.End(); ++i)
         i->second_->ConfigureNetworkSimulator(simulatedLatency_, simulatedPacketLoss_);
 }

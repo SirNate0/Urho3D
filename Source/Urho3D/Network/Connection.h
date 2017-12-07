@@ -29,8 +29,9 @@
 #include "../IO/VectorBuffer.h"
 #include "../Scene/ReplicationState.h"
 
-#include <kNet/kNetFwd.h>
-#include <kNet/SharedPtr.h>
+#include <RakNet/MessageIdentifiers.h>
+#include <RakNet/RakPeerInterface.h>
+#include <RakNet/RakNetTypes.h>
 
 #ifdef SendMessage
 #undef SendMessage
@@ -108,9 +109,9 @@ class URHO3D_API Connection : public Object
 
 public:
     /// Construct with context and kNet message connection pointers.
-    Connection(Context* context, bool isClient, kNet::SharedPtr<kNet::MessageConnection> connection);
+    Connection(Context* context, bool isClient, const RakNet::AddressOrGUID& address, RakNet::RakPeerInterface* peer);
     /// Destruct.
-    virtual ~Connection() override;
+    ~Connection();
 
     /// Send a message.
     void SendMessage(int msgID, bool reliable, bool inOrder, const VectorBuffer& msg, unsigned contentID = 0);
@@ -149,8 +150,10 @@ public:
     /// Process a message from the server or client. Called by Network.
     bool ProcessMessage(int msgID, MemoryBuffer& msg);
 
-    /// Return the kNet message connection.
-    kNet::MessageConnection* GetMessageConnection() const;
+    /// Return the RakNet address/guid.
+    const RakNet::AddressOrGUID& GetAddressOrGUID() const { return address_; }
+    /// Set the the RakNet address/guid.
+    void SetAddressOrGUID(const RakNet::AddressOrGUID& addr) { address_ = addr; }
 
     /// Return client identity.
     VariantMap& GetIdentity() { return identity_; }
@@ -186,7 +189,7 @@ public:
     bool GetLogStatistics() const { return logStatistics_; }
 
     /// Return remote address.
-    String GetAddress() const { return address_; }
+    String GetAddress() const { return String(address_.ToString(false /*write port*/)); }
 
     /// Return remote port.
     unsigned short GetPort() const { return port_; }
@@ -270,8 +273,6 @@ private:
     /// Handle all packages loaded successfully. Also called directly on MSG_LOADSCENE if there are none.
     void OnPackagesReady();
 
-    /// kNet message connection.
-    kNet::SharedPtr<kNet::MessageConnection> connection_;
     /// Scene.
     WeakPtr<Scene> scene_;
     /// Network replication state of the scene.
@@ -294,8 +295,6 @@ private:
     String sceneFileName_;
     /// Statistics timer.
     Timer statsTimer_;
-    /// Remote endpoint address.
-    String address_;
     /// Remote endpoint port.
     unsigned short port_;
     /// Observer position for interest management.
@@ -312,6 +311,10 @@ private:
     bool sceneLoaded_;
     /// Show statistics flag.
     bool logStatistics_;
+    /// Address of this connection.
+    RakNet::AddressOrGUID address_;
+    /// Raknet peer object.
+    RakNet::RakPeerInterface* peer_;
 };
 
 }
