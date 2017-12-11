@@ -403,19 +403,44 @@ bool Network::StartServer(unsigned short port)
 
     URHO3D_PROFILE(StartServer);
 
-    RakNet::SocketDescriptor socket(port, 0);
-    RakNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
-    if (startResult == RakNet::RAKNET_STARTED)
+//    RakNet::SocketDescriptor socket(port, 0);
+//    RakNet::StartupResult startResult = rakPeer_->Startup(128, &socket, 1);
+//    if (startResult == RakNet::RAKNET_STARTED)
+//    {
+//        URHO3D_LOGINFO("Started server on port " + String(port));
+//        rakPeer_->SetMaximumIncomingConnections(128);
+//        isServer_ = true;
+//        return true;
+//    }
+//    else
+//    {
+//        URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String((int)startResult));
+//        return false;
+//    }
+    
+    RakNet::SocketDescriptor socketDescriptors[2];
+    socketDescriptors[0].port=port;
+    socketDescriptors[0].socketFamily=AF_INET; // Test out IPV4
+    socketDescriptors[1].port=port;
+    socketDescriptors[1].socketFamily=AF_INET6; // Test out IPV6
+    RakNet::StartupResult startResult = rakPeer_->Startup(128, socketDescriptors, 2 );
+    if (startResult != RakNet::RAKNET_STARTED)
+    {
+        URHO3D_LOGINFO("Failed to start dual IPV4 and IPV6 ports. Trying IPV4 only.");
+        // Try again, but leave out IPV6
+        startResult = rakPeer_->Startup(128, socketDescriptors, 1 );
+    }
+    if (startResult != RakNet::RAKNET_STARTED)
+    {
+        URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String((int)startResult));
+        return false;
+    }
+    else
     {
         URHO3D_LOGINFO("Started server on port " + String(port));
         rakPeer_->SetMaximumIncomingConnections(128);
         isServer_ = true;
         return true;
-    }
-    else
-    {
-        URHO3D_LOGINFO("Failed to start server on port " + String(port) + ", error code: " + String((int)startResult));
-        return false;
     }
 }
 
