@@ -70,14 +70,13 @@ typedef RakNet::TimeUS CCTimeType;
 typedef RakNet::TimeMS CCTimeType;
 #endif
 
+typedef RakNet::uint24_t DatagramSequenceNumberType;
 typedef double BytesPerMicrosecond;
 typedef double BytesPerSecond;
 typedef double MicrosecondsPerByte;
 
 namespace RakNet
 {
-
-typedef uint24_t DatagramSequenceNumberType;
 
 class CCRakNetSlidingWindow
 {
@@ -130,14 +129,12 @@ class CCRakNetSlidingWindow
 	/// hasBAndAS are possibly written with the ack, see OnSendAck()
 	/// B and AS are used in the calculations in UpdateWindowSizeAndAckOnAckPerSyn
 	/// B and AS are updated at most once per SYN 
-    /// Urho3D: JSandusky, use of _BB and _AS macros as 'helper indicators' make MSVC2015 error out for unknown identifier
-	void OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond, BytesPerMicrosecond, double totalUserDataBytesAcked, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber );
+	void OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond _BB, BytesPerMicrosecond _AS, double totalUserDataBytesAcked, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber );
 	void OnDuplicateAck( CCTimeType curTime, DatagramSequenceNumberType sequenceNumber );
 	
 	/// Call when you send an ack, to see if the ack should have the B and AS parameters transmitted
 	/// Call before calling OnSendAck()
-    /// Urho3D: JSandusky, use of _BB and _AS macros as 'helper indicators' make MSVC2015 error out for unknown identifier
-	void OnSendAckGetBAndAS(CCTimeType curTime, bool *hasBAndAS, BytesPerMicrosecond *, BytesPerMicrosecond *);
+	void OnSendAckGetBAndAS(CCTimeType curTime, bool *hasBAndAS, BytesPerMicrosecond *_BB, BytesPerMicrosecond *_AS);
 
 	/// Call when we send an ack, to write B and AS if needed
 	/// B and AS are only written once per SYN, to prevent slow calculations

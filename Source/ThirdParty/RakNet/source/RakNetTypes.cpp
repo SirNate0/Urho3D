@@ -34,6 +34,10 @@
 #include <arpa/inet.h>
 #endif
 
+#if (defined(__GNUC__)  || defined(__GCCXML__)) && !defined(__WIN32__)
+#include <netdb.h> // for addrinfo
+#endif
+
 #include <string.h> // strncasecmp
 #include "Itoa.h"
 #include "SocketLayer.h"

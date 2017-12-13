@@ -20,6 +20,8 @@
 
 #include "Itoa.h"
 
+#include "LinuxStrings.h"
+
 void RNS2_Berkley::SetSocketOptions(void)
 {
 	int r;

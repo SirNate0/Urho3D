@@ -27,6 +27,10 @@
 #define INVALID_SOCKET -1
 #endif
 
+#if (defined(__GNUC__)  || defined(__GCCXML__)) && !defined(__WIN32__)
+#include <netdb.h> // for addrinfo
+#endif
+
 using namespace RakNet;
 static const unsigned short DEFAULT_MAX_FORWARD_ENTRIES=64;
 
