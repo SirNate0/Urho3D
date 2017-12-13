@@ -366,6 +366,7 @@ bool Network::Connect(const String& address, unsigned short port, Scene* scene, 
 
     isServer_ = false;
     RakNet::SocketDescriptor socket;
+    socket.socketFamily=AF_INET6; // Test out IPV6
     rakPeer_->Startup(1, &socket, 1);
     RakNet::ConnectionAttemptResult connectResult = rakPeer_->Connect(address.CString(), port, 0, 0);
     if (connectResult != RakNet::CONNECTION_ATTEMPT_STARTED)
@@ -418,11 +419,11 @@ bool Network::StartServer(unsigned short port)
 //        return false;
 //    }
     
-    RakNet::SocketDescriptor socketDescriptors[2];
-    socketDescriptors[0].port=port;
-    socketDescriptors[0].socketFamily=AF_INET; // Test out IPV4
-    socketDescriptors[1].port=port;
-    socketDescriptors[1].socketFamily=AF_INET6; // Test out IPV6
+    RakNet::SocketDescriptor socketDescriptors[2] = {RakNet::SocketDescriptor(port,0), RakNet::SocketDescriptor(port+1,0)};
+//    socketDescriptors[0].port=port;
+    socketDescriptors[0].socketFamily=AF_INET6; // Test out IPV6
+//    socketDescriptors[1].port=port;
+    socketDescriptors[1].socketFamily=AF_INET; // Test out IPV4
     RakNet::StartupResult startResult = rakPeer_->Startup(128, socketDescriptors, 2 );
     if (startResult != RakNet::RAKNET_STARTED)
     {
