@@ -1,0 +1,6 @@
+<renderpath>
+    <command type="quad" tag="HueRotation" vs="HueRotation" ps="HueRotation" output="viewport">
+        <parameter name="Rotation" value="1.75" />
+        <texture unit="diffuse" name="viewport" />
+    </command>
+</renderpath>
