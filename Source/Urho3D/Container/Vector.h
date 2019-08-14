@@ -405,6 +405,32 @@ public:
         return it;
     }
 
+    /// Return iterator to last value, or to the end if not found.
+    Iterator FindLast(const T& value)
+    {
+        if (!Size())
+            return End();
+        for (Iterator it = --End(); it != Begin(); ++it)
+            if (*it == value)
+                return it;
+        if (Front() == value)
+            return Begin();
+        return End();
+    }
+
+    /// Return const iterator to last value, or to the end if not found.
+    ConstIterator FindLast(const T& value) const
+    {
+        if (!Size())
+            return End();
+        for (ConstIterator it = --End(); it != Begin(); ++it)
+            if (*it == value)
+                return it;
+        if (Front() == value)
+            return Begin();
+        return End();
+    }
+
     /// Return index of value in vector, or size if not found.
     unsigned IndexOf(const T& value) const
     {
@@ -987,6 +1013,32 @@ public:
         while (it != End() && *it != value)
             ++it;
         return it;
+    }
+
+    /// Return iterator to last value, or to the end if not found.
+    Iterator FindLast(const T& value)
+    {
+        if (!Size())
+            return End();
+        for (Iterator it = --End(); it != Begin(); ++it)
+            if (*it == value)
+                return it;
+        if (Front() == value)
+            return Begin();
+        return End();
+    }
+
+    /// Return const iterator to last value, or to the end if not found.
+    ConstIterator FindLast(const T& value) const
+    {
+        if (!Size())
+            return End();
+        for (ConstIterator it = --End(); it != Begin(); ++it)
+            if (*it == value)
+                return it;
+        if (Front() == value)
+            return Begin();
+        return End();
     }
 
     /// Return index of value in vector, or size if not found.
