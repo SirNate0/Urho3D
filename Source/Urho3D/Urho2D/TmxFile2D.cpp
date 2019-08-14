@@ -349,7 +349,7 @@ bool TmxImageLayer2D::Load(const XMLElement& element, const TileMapInfo2D& info)
     source_ = imageElem.GetAttribute("source");
     String textureFilePath = GetParentPath(tmxFile_->GetName()) + source_;
     auto* cache = tmxFile_->GetSubsystem<ResourceCache>();
-    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+    SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath, GetName()));
     if (!texture)
     {
         URHO3D_LOGERROR("Could not load texture " + textureFilePath);
@@ -428,12 +428,12 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
 
                 String textureFilePath =
                     GetParentPath(GetName()) + tsxXMLFile->GetRoot("tileset").GetChild("image").GetAttribute("source");
-                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
             }
             else
             {
                 String textureFilePath = GetParentPath(GetName()) + tileSetElem.GetChild("image").GetAttribute("source");
-                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+                GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
             }
         }
 
@@ -441,7 +441,7 @@ bool TmxFile2D::BeginLoad(Deserializer& source)
              imageLayerElem = imageLayerElem.GetNext("imagelayer"))
         {
             String textureFilePath = GetParentPath(GetName()) + imageLayerElem.GetChild("image").GetAttribute("source");
-            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, true, this);
+            GetSubsystem<ResourceCache>()->BackgroundLoadResource<Texture2D>(textureFilePath, GetName(), true, this);
         }
     }
 
@@ -655,10 +655,11 @@ bool TmxFile2D::LoadTileSet(const XMLElement& element)
     {
         XMLElement imageElem = tileSetElem.GetChild("image");
         // Tileset based on single tileset image
-        if (imageElem.NotNull()) {
+        if (imageElem.NotNull()) 
+        {
             isSingleTileSet = true;
             String textureFilePath = GetParentPath(GetName()) + imageElem.GetAttribute("source");
-            SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath));
+            SharedPtr<Texture2D> texture(cache->GetResource<Texture2D>(textureFilePath, GetName()));
             if (!texture)
             {
                 URHO3D_LOGERROR("Could not load texture " + textureFilePath);

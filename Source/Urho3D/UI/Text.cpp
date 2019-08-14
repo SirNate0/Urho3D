@@ -253,7 +253,7 @@ void Text::OnIndentSet()
 bool Text::SetFont(const String& fontName, float size)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    return SetFont(cache->GetResource<Font>(fontName), size);
+    return SetFont(cache->GetResource<Font>(fontName, GetBasePath()), size);
 }
 
 bool Text::SetFont(Font* font, float size)
@@ -443,7 +443,7 @@ Vector2 Text::GetCharSize(unsigned index)
 void Text::SetFontAttr(const ResourceRef& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    font_ = cache->GetResource<Font>(value.name_);
+    font_ = cache->GetResource<Font>(value.name_, GetBasePath());
 }
 
 ResourceRef Text::GetFontAttr() const

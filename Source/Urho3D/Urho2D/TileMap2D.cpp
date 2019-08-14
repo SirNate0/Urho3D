@@ -177,7 +177,7 @@ bool TileMap2D::PositionToTileIndex(int& x, int& y, const Vector2& position) con
 void TileMap2D::SetTmxFileAttr(const ResourceRef& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    SetTmxFile(cache->GetResource<TmxFile2D>(value.name_));
+    SetTmxFile(cache->GetResource<TmxFile2D>(value.name_, GetBasePath()));
 }
 
 ResourceRef TileMap2D::GetTmxFileAttr() const

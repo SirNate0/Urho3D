@@ -24,6 +24,21 @@
 
 #include "../Core/Variant.h"
 
+#ifdef URHO3D_FMT
+#include <fmt/format.h>
+// Enables passing a String as an argument without calling CString() on it
+namespace fmt {
+// Formats a value.
+template <typename Char, typename ArgFormatter, typename T>
+void format(BasicFormatter<Char, ArgFormatter> &f,
+            const Char *&format_str, const T &value)
+{
+    typedef internal::MakeArg< BasicFormatter<Char> > MakeArg;
+    format_str = f.format(format_str,MakeArg(value.CString()));
+}
+}
+#endif
+
 namespace Urho3D
 {
 
@@ -137,6 +152,17 @@ URHO3D_API unsigned ToLower(unsigned ch);
 URHO3D_API String GetFileSizeString(unsigned long long memorySize);
 /// Decode a base64-encoded string into buffer.
 URHO3D_API PODVector<unsigned char> DecodeBase64(String encodedString);
+
+#ifdef URHO3D_FMT
+/// Return a formatted string following a python-style str.format syntax.
+inline String FormatString(const char* format_str, fmt::ArgList args) {
+  fmt::MemoryWriter w;
+  w.write(format_str, args);
+  return String(w.c_str());
+}
+FMT_VARIADIC(String, FormatString, const char*)
+#endif
+
 /// Parse type from a C string.
 template <class T> T FromString(const char* source);
 

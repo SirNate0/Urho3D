@@ -223,6 +223,14 @@ void Component::CleanupConnection(Connection* connection)
     }
 }
 
+const String& Component::GetBasePath() const
+{
+    if (node_)
+        return node_->GetBasePath();
+    else
+        return String::EMPTY;
+}
+
 void Component::OnAttributeAnimationAdded()
 {
     if (attributeAnimationInfos_.Size() == 1)

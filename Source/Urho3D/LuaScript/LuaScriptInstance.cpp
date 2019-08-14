@@ -758,7 +758,7 @@ LuaFunction* LuaScriptInstance::GetScriptObjectFunction(const String& functionNa
 void LuaScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    SetScriptFile(cache->GetResource<LuaFile>(value.name_));
+    SetScriptFile(cache->GetResource<LuaFile>(value.name_, GetBasePath()));
 }
 
 ResourceRef LuaScriptInstance::GetScriptFileAttr() const

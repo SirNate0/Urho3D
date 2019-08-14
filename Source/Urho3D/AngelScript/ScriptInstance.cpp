@@ -439,7 +439,7 @@ bool ScriptInstance::HasMethod(const String& declaration) const
 void ScriptInstance::SetScriptFileAttr(const ResourceRef& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    SetScriptFile(cache->GetResource<ScriptFile>(value.name_));
+    SetScriptFile(cache->GetResource<ScriptFile>(value.name_, GetBasePath()));
 }
 
 void ScriptInstance::SetDelayedCallsAttr(const PODVector<unsigned char>& value)

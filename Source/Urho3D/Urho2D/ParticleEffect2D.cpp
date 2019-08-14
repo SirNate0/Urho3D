@@ -130,7 +130,7 @@ bool ParticleEffect2D::BeginLoad(Deserializer& source)
     loadSpriteName_ = GetParentPath(GetName()) + texture;
     // If async loading, request the sprite beforehand
     if (GetAsyncLoadState() == ASYNC_LOADING)
-        GetSubsystem<ResourceCache>()->BackgroundLoadResource<Sprite2D>(loadSpriteName_, true, this);
+        GetSubsystem<ResourceCache>()->BackgroundLoadResource<Sprite2D>(loadSpriteName_, GetName(), true, this);
 
     sourcePositionVariance_ = ReadVector2(rootElem, "sourcePositionVariance");
 
@@ -214,7 +214,7 @@ bool ParticleEffect2D::EndLoad()
     if (!loadSpriteName_.Empty())
     {
         auto* cache = GetSubsystem<ResourceCache>();
-        sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_);
+        sprite_ = cache->GetResource<Sprite2D>(loadSpriteName_, GetName());
         if (!sprite_)
             URHO3D_LOGERROR("Could not load sprite " + loadSpriteName_ + " for particle effect");
 
@@ -513,7 +513,7 @@ SharedPtr<ParticleEffect2D> ParticleEffect2D::Clone(const String& cloneName) con
     ret->rotationEndVariance_ = rotationEndVariance_;
     /// \todo Zero if source was created programmatically
     ret->SetMemoryUse(GetMemoryUse());
-
+    
     return ret;
 }
 

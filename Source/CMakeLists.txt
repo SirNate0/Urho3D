@@ -135,6 +135,14 @@ if (NOT ANDROID AND NOT ARM AND NOT WEB)
     endif ()
 endif ()
 
+if (URHO3D_ROCKET)
+    add_subdirectory (ThirdParty/libRocket)
+endif ()
+
+if (URHO3D_FMT)
+    add_subdirectory (ThirdParty/fmt)
+endif ()
+
 # Urho3D game engine library
 add_subdirectory (Urho3D)
 

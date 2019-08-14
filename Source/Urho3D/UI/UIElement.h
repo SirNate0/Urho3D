@@ -101,13 +101,13 @@ enum TraversalMode
 
 enum DragAndDropMode : unsigned
 {
-    /// Drag and drop disabled.
+/// Drag and drop disabled.
     DD_DISABLED = 0x0,
-    /// Drag and drop source flag.
+/// Drag and drop source flag.
     DD_SOURCE = 0x1,
-    /// Drag and drop target flag.
+/// Drag and drop target flag.
     DD_TARGET = 0x2,
-    /// Drag and drop source and target.
+/// Drag and drop source and target.
     DD_SOURCE_AND_TARGET = 0x3,
 };
 URHO3D_FLAGSET(DragAndDropMode, DragAndDropModeFlags);
@@ -372,6 +372,9 @@ public:
     /// Set element event sender flag. When child element is added or deleted, the event would be sent using UIElement found in the parental chain having this flag set. If not set, the event is sent using UI's root as per normal.
     void SetElementEventSender(bool flag);
 
+    /// Sets the absolute path associated with this element (set during loading or manually)
+    virtual void SetBasePath(const String& basePath);
+
     /// Set tags. Old tags are overwritten.
     void SetTags(const StringVector& tags);
     /// Add a tag.
@@ -583,6 +586,9 @@ public:
     /// Return all user variables.
     const VariantMap& GetVars() const { return vars_; }
 
+    /// Returns the absolute path associated with this node (set during loading or manually)
+    virtual const String& GetBasePath() const { return basePath_; }
+
     /// Return whether element is tagged by a specific tag.
     bool HasTag(const String& tag) const;
 
@@ -681,6 +687,10 @@ protected:
     Color colors_[MAX_UIELEMENT_CORNERS];
     /// User variables.
     VariantMap vars_;
+
+    /// Path to use in resolving relative paths for resources
+    String basePath_;
+
     /// Priority.
     int priority_{};
     /// Bring to front when focused flag.

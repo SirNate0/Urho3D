@@ -368,7 +368,7 @@ int LuaScript::Loader(lua_State* L)
     auto* cache = ::GetContext(L)->GetSubsystem<ResourceCache>();
 
     // Attempt to get .luc file first
-    auto* lucFile = cache->GetResource<LuaFile>(fileName + ".luc", false);
+    auto* lucFile = cache->GetResource<LuaFile>(fileName + ".luc", "",false);
     if (lucFile)
         return lucFile->LoadChunk(L) ? 1 : 0;
 

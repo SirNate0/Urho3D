@@ -367,4 +367,11 @@ URHO3D_API StringHashRegister& GetEventNameRegister();
 /// Convenience macro to construct an EventHandler that points to a receiver object and its member function, and also defines a userdata pointer.
 #define URHO3D_HANDLER_USERDATA(className, function, userData) (new Urho3D::EventHandlerImpl<className>(this, &className::function, userData))
 
+//Convenience macros so that URHO3D_ is not needed
+#define EVENT(eventID, eventName) URHO3D_EVENT(eventID, eventName) 
+#define PARAM(paramID, paramName) URHO3D_PARAM(paramID, paramName)
+#define HANDLER(className, function) URHO3D_HANDLER(className, function)
+#define HANDLER_USERDATA(className, function, userData) URHO3D_HANDLER_USERDATA(className, function, userData)
+#define OBJECT(typeName, baseTypeName) URHO3D_OBJECT(typeName, baseTypeName)
+
 }

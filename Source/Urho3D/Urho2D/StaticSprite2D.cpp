@@ -247,7 +247,7 @@ Material* StaticSprite2D::GetCustomMaterial() const
 
 void StaticSprite2D::SetSpriteAttr(const ResourceRef& value)
 {
-    Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value);
+    Sprite2D* sprite = Sprite2D::LoadFromResourceRef(this, value, GetBasePath());
     if (sprite)
         SetSprite(sprite);
 }
@@ -260,7 +260,7 @@ ResourceRef StaticSprite2D::GetSpriteAttr() const
 void StaticSprite2D::SetCustomMaterialAttr(const ResourceRef& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    SetCustomMaterial(cache->GetResource<Material>(value.name_));
+    SetCustomMaterial(cache->GetResource<Material>(value.name_, GetBasePath()));
 }
 
 ResourceRef StaticSprite2D::GetCustomMaterialAttr() const

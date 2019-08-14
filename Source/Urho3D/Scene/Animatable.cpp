@@ -244,7 +244,7 @@ bool Animatable::SaveJSON(JSONValue& dest) const
 
         attributeAnimationValue.Set(attr.name_, attributeValue);
     }
-    
+
     if (!attributeAnimationValue.IsNull())
         dest.Set("attributeanimation", attributeAnimationValue);
     
@@ -454,7 +454,7 @@ void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
     if (!value.name_.Empty())
     {
         auto* cache = GetSubsystem<ResourceCache>();
-        SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_));
+        SetObjectAnimation(cache->GetResource<ObjectAnimation>(value.name_, GetBasePath()));
     }
 }
 

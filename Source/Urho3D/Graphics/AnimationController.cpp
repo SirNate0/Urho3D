@@ -160,7 +160,7 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
 {
     // Get the animation resource first to be able to get the canonical resource name
     // (avoids potential adding of duplicate animations)
-    auto* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name);
+    auto* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(name, GetBasePath());
     if (!newAnimation)
         return false;
 
@@ -197,11 +197,11 @@ bool AnimationController::Play(const String& name, unsigned char layer, bool loo
 bool AnimationController::PlayExclusive(const String& name, unsigned char layer, bool looped, float fadeTime)
 {
     bool success = Play(name, layer, looped, fadeTime);
-
+    
     // Fade other animations only if successfully started the new one
     if (success)
         FadeOthers(name, 0.0f, fadeTime);
-
+    
     return success;
 }
 
@@ -629,7 +629,7 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
         AnimationState* state = GetAnimationState(animHash);
         if (!state)
         {
-            auto* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animName);
+            auto* newAnimation = GetSubsystem<ResourceCache>()->GetResource<Animation>(animName, GetBasePath());
             state = AddAnimationState(newAnimation);
             if (!state)
             {
@@ -671,9 +671,9 @@ void AnimationController::SetNetAnimationsAttr(const PODVector<unsigned char>& v
             animations_[index].autoFadeTime_ = (float)buf.ReadUByte() / 64.0f; // 6 bits of decimal precision, max. 4 seconds fade
         else
             animations_[index].autoFadeTime_ = 0.0f;
-
+        
         animations_[index].removeOnCompletion_ = (ctrl & CTRL_REMOVEONCOMPLETION) != 0;
-
+        
         if (ctrl & CTRL_SETTIME)
         {
             unsigned char setTimeRev = buf.ReadUByte();
@@ -728,7 +728,7 @@ void AnimationController::SetNodeAnimationStatesAttr(const VariantVector& value)
         {
             // Note: null animation is allowed here for editing
             const ResourceRef& animRef = value[index++].GetResourceRef();
-            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), cache->GetResource<Animation>(animRef.name_)));
+            SharedPtr<AnimationState> newState(new AnimationState(GetNode(), cache->GetResource<Animation>(animRef.name_, GetBasePath())));
             nodeAnimationStates_.Push(newState);
 
             newState->SetLooped(value[index++].GetBool());

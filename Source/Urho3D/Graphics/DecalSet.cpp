@@ -518,7 +518,7 @@ Material* DecalSet::GetMaterial() const
 void DecalSet::SetMaterialAttr(const ResourceRef& value)
 {
     auto* cache = GetSubsystem<ResourceCache>();
-    SetMaterial(cache->GetResource<Material>(value.name_));
+    SetMaterial(cache->GetResource<Material>(value.name_, GetBasePath()));
 }
 
 void DecalSet::SetDecalsAttr(const PODVector<unsigned char>& value)
@@ -1013,14 +1013,14 @@ void DecalSet::UpdateBuffers()
     const VertexMaskFlags newElementMask = skinned_ ? SKINNED_ELEMENT_MASK : STATIC_ELEMENT_MASK;
     unsigned newVBSize = optimizeBufferSize_ ? numVertices_ : maxVertices_;
     unsigned newIBSize = optimizeBufferSize_ ? numIndices_ : maxIndices_;
-
+    
     if (vertexBuffer_->GetElementMask() != newElementMask || vertexBuffer_->GetVertexCount() != newVBSize)
         vertexBuffer_->SetSize(newVBSize, newElementMask);
     if (indexBuffer_->GetIndexCount() != newIBSize)
         indexBuffer_->SetSize(newIBSize, false);
     geometry_->SetVertexBuffer(0, vertexBuffer_);
     geometry_->SetDrawRange(TRIANGLE_LIST, 0, numIndices_, 0, numVertices_);
-
+    
     float* vertices = numVertices_ ? (float*)vertexBuffer_->Lock(0, numVertices_) : nullptr;
     unsigned short* indices = numIndices_ ? (unsigned short*)indexBuffer_->Lock(0, numIndices_) : nullptr;
 

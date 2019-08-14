@@ -1734,7 +1734,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
         }
         else
         {
-            Texture* texture = FindNamedTexture(command.outputs_[index].first_, true, false);
+            Texture* texture = FindNamedTexture(command.outputs_[index].first_, command.basePath_, true, false);
 
             // Check for depth only rendering (by specifying a depth texture as the sole output)
             if (!index && command.outputs_.Size() == 1 && texture && (texture->GetFormat() == Graphics::GetReadableDepthFormat() ||
@@ -1768,7 +1768,7 @@ void View::SetRenderTargets(RenderPathCommand& command)
 
     if (command.depthStencilName_.Length())
     {
-        Texture* depthTexture = FindNamedTexture(command.depthStencilName_, true, false);
+        Texture* depthTexture = FindNamedTexture(command.depthStencilName_, command.basePath_, true, false);
         if (depthTexture)
         {
             useCustomDepth = true;
@@ -1806,9 +1806,9 @@ bool View::SetTextures(RenderPathCommand& command)
         }
 
 #ifdef DESKTOP_GRAPHICS
-        Texture* texture = FindNamedTexture(command.textureNames_[i], false, i == TU_VOLUMEMAP);
+        Texture* texture = FindNamedTexture(command.textureNames_[i], command.basePath_, false, i == TU_VOLUMEMAP);
 #else
-        Texture* texture = FindNamedTexture(command.textureNames_[i], false, false);
+        Texture* texture = FindNamedTexture(command.textureNames_[i], command.basePath_, false, false);
 #endif
 
         if (texture)
@@ -3172,7 +3172,7 @@ void View::SendViewEvent(StringHash eventType)
     renderer_->SendEvent(eventType, eventData);
 }
 
-Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool isVolumeMap)
+Texture* View::FindNamedTexture(const String& name, const String &basePath, bool isRenderTarget, bool isVolumeMap)
 {
     // Check rendertargets first
     StringHash nameHash(name);
@@ -3207,15 +3207,15 @@ Texture* View::FindNamedTexture(const String& name, bool isRenderTarget, bool is
                 type = Texture3D::GetTypeStatic();
 
             if (type == Texture3D::GetTypeStatic())
-                return cache->GetResource<Texture3D>(name);
+                return cache->GetResource<Texture3D>(name, basePath);
             else if (type == Texture2DArray::GetTypeStatic())
-                return cache->GetResource<Texture2DArray>(name);
+                return cache->GetResource<Texture2DArray>(name, basePath);
             else
 #endif
-                return cache->GetResource<TextureCube>(name);
+                return cache->GetResource<TextureCube>(name, basePath);
         }
         else
-            return cache->GetResource<Texture2D>(name);
+            return cache->GetResource<Texture2D>(name, basePath);
     }
 
     return nullptr;

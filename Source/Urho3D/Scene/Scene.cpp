@@ -1290,6 +1290,8 @@ void Scene::FinishSaving(Serializer* dest) const
 
 void Scene::PreloadResources(File* file, bool isSceneFile)
 {
+    //Setting the base path regardless, for consistency across threaded and non-threaded platforms
+    SetBasePath(file->GetName());
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING
     auto* cache = GetSubsystem<ResourceCache>();
@@ -1332,7 +1334,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
                     const ResourceRef& ref = varValue.GetResourceRef();
                     // Sanitate resource name beforehand so that when we get the background load event, the name matches exactly
                     String name = cache->SanitateResourceName(ref.name_);
-                    bool success = cache->BackgroundLoadResource(ref.type_, name);
+                    bool success = cache->BackgroundLoadResource(ref.type_, name, GetBasePath());
                     if (success)
                     {
                         ++asyncProgress_.totalResources_;
@@ -1345,7 +1347,7 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
                     for (unsigned k = 0; k < refList.names_.Size(); ++k)
                     {
                         String name = cache->SanitateResourceName(refList.names_[k]);
-                        bool success = cache->BackgroundLoadResource(refList.type_, name);
+                        bool success = cache->BackgroundLoadResource(refList.type_, name, GetBasePath());
                         if (success)
                         {
                             ++asyncProgress_.totalResources_;
@@ -1366,6 +1368,8 @@ void Scene::PreloadResources(File* file, bool isSceneFile)
 
 void Scene::PreloadResourcesXML(const XMLElement& element)
 {
+    //Setting the base path regardless, for consistency across threaded and non-threaded platforms
+    SetBasePath(element.GetBasePath());
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING
     auto* cache = GetSubsystem<ResourceCache>();
@@ -1396,7 +1400,7 @@ void Scene::PreloadResourcesXML(const XMLElement& element)
                         {
                             ResourceRef ref = attrElem.GetVariantValue(attr.type_).GetResourceRef();
                             String name = cache->SanitateResourceName(ref.name_);
-                            bool success = cache->BackgroundLoadResource(ref.type_, name);
+                            bool success = cache->BackgroundLoadResource(ref.type_, name, GetBasePath());
                             if (success)
                             {
                                 ++asyncProgress_.totalResources_;
@@ -1409,7 +1413,7 @@ void Scene::PreloadResourcesXML(const XMLElement& element)
                             for (unsigned k = 0; k < refList.names_.Size(); ++k)
                             {
                                 String name = cache->SanitateResourceName(refList.names_[k]);
-                                bool success = cache->BackgroundLoadResource(refList.type_, name);
+                                bool success = cache->BackgroundLoadResource(refList.type_, name, GetBasePath());
                                 if (success)
                                 {
                                     ++asyncProgress_.totalResources_;
@@ -1446,6 +1450,7 @@ void Scene::PreloadResourcesXML(const XMLElement& element)
 
 void Scene::PreloadResourcesJSON(const JSONValue& value)
 {
+#warning cannot get the base path for scene preloading from JSONValue -> Falling back to present base path
     // If not threaded, can not background load resources, so rather load synchronously later when needed
 #ifdef URHO3D_THREADING
     auto* cache = GetSubsystem<ResourceCache>();
@@ -1481,7 +1486,7 @@ void Scene::PreloadResourcesJSON(const JSONValue& value)
                         {
                             ResourceRef ref = attrVal.Get("value").GetVariantValue(attr.type_).GetResourceRef();
                             String name = cache->SanitateResourceName(ref.name_);
-                            bool success = cache->BackgroundLoadResource(ref.type_, name);
+                            bool success = cache->BackgroundLoadResource(ref.type_, name, GetBasePath());
                             if (success)
                             {
                                 ++asyncProgress_.totalResources_;
@@ -1494,7 +1499,7 @@ void Scene::PreloadResourcesJSON(const JSONValue& value)
                             for (unsigned k = 0; k < refList.names_.Size(); ++k)
                             {
                                 String name = cache->SanitateResourceName(refList.names_[k]);
-                                bool success = cache->BackgroundLoadResource(refList.type_, name);
+                                bool success = cache->BackgroundLoadResource(refList.type_, name, GetBasePath());
                                 if (success)
                                 {
                                     ++asyncProgress_.totalResources_;
