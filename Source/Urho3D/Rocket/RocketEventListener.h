@@ -41,7 +41,7 @@ protected:
 class RocketEventListener: public ::Rocket::Core::EventListener
 {
 public:
-	URHO3D_OBJECT(RocketEventListener, Urho3D::Object);
+	//URHO3D_OBJECT(RocketEventListener, Urho3D::Object);
 	RocketEventListener(const ::Rocket::Core::String& context, Urho3D::ScriptFile* sf, RocketEventListenerInstancer* parent);
 	virtual ~RocketEventListener();
 //	static void Register(Urho3D::Context* context);
